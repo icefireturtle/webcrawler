@@ -29,9 +29,30 @@ class TestCrawlHTTPSlash(unittest.TestCase):
         expected = "blog.boot.dev/path"
         self.assertEqual(actual, expected)
 
-class TestCrawlWWW(unittest.TestCase):
+class TestCrawlHTTPWWW(unittest.TestCase):
+    def test_normalize_url(self):
+        input_url = "http://www.blog.boot.dev/path"
+        actual = normalize_url(input_url)
+        expected = "blog.boot.dev/path"
+        self.assertEqual(actual, expected)
+
+class TestCrawlHTTPWWWSlash(unittest.TestCase):
     def test_normalize_url(self):
         input_url = "http://www.blog.boot.dev/path/"
+        actual = normalize_url(input_url)
+        expected = "blog.boot.dev/path"
+        self.assertEqual(actual, expected)
+
+class TestCrawlHTTPSWWW(unittest.TestCase):
+    def test_normalize_url(self):
+        input_url = "https://www.blog.boot.dev/path"
+        actual = normalize_url(input_url)
+        expected = "blog.boot.dev/path"
+        self.assertEqual(actual, expected)
+
+class TestCrawlHTTPSWWWSlash(unittest.TestCase):
+    def test_normalize_url(self):
+        input_url = "https://www.blog.boot.dev/path/"
         actual = normalize_url(input_url)
         expected = "blog.boot.dev/path"
         self.assertEqual(actual, expected)
