@@ -36,12 +36,29 @@ def get_h1_from_html(html):
     doc = BeautifulSoup(html, 'html.parser')
     text = ""
 
-    if len(html) == 0:
+    if len(html) == 0 or doc.find('h1') == None:
         return text
 
     text = doc.find('h1')
-    print(f"wooo first text {text}")
+    #print(f"wooo first text {text}")
     text = text.get_text()
-    print(f"wooo second text {text}")
+    #print(f"wooo second text {text}")
+
+    return text
+
+def get_first_paragraph_from_html(html):
+    doc = BeautifulSoup(html, 'html.parser')
+    main = doc.find('main')
+    text = ""
+
+    if len(html) == 0 or doc.find('p') == None:
+        return text
+
+    if main == None:
+        text = doc.find('p')
+        text = text.get_text()
+    else:
+        text = main.find('p')
+        text = text.get_text()
 
     return text
