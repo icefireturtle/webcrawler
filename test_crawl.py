@@ -1,5 +1,5 @@
 import unittest
-from crawl import normalize_url, get_h1_from_html, get_first_paragraph_from_html
+from crawl import normalize_url, get_h1_from_html, get_first_paragraph_from_html, get_urls_from_html, get_images_from_html
 
 class TestCrawlHTTPS(unittest.TestCase):
     def test_normalize_url(self):
@@ -104,6 +104,22 @@ class TestCrawlParagraph_4_No_Main(unittest.TestCase):
         input_html = "<html><body><p>Outside paragraph.</p><p>Main paragraph.</p></body></html>"
         actual = get_first_paragraph_from_html(input_html)
         expected = "Outside paragraph."
+        self.assertEqual(actual, expected)
+
+class TestCrawlURLs(unittest.TestCase):
+    def test_get_urls_from_html_absolute(self):
+        input_url = "https://blog.boot.dev"
+        input_body= "<html><body><a href=\"https://blog.boot.dev\"><span>Boot.dev</span></a></body></html>"
+        actual = get_urls_from_html(input_body, input_url)
+        expected = ["https://blog.boot.dev"]
+        self.assertEqual(actual, expected)
+
+class TestCrawlImages(unittest.TestCase):
+    def test_get_images_from_html_relative(self):
+        input_url = "https://blog.boot.dev"
+        input_body = "<html><body><img src=\"/logo.png\" alt=\"Logo\"></body></html>"
+        actual = get_images_from_html(input_body, input_url)
+        expected = ["https://blog.boot.dev/logo.png"]
         self.assertEqual(actual, expected)
 
 if __name__ == "__main__":
