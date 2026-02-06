@@ -114,12 +114,52 @@ class TestCrawlURLs(unittest.TestCase):
         expected = ["https://blog.boot.dev"]
         self.assertEqual(actual, expected)
 
+class TestCrawlURLs_None(unittest.TestCase):
+    def test_get_urls_from_html_absolute(self):
+        input_url = "https://testurldoesnotexist.com"
+        input_body= "<html><body><img src=\"/logo.png\" alt=\"Logo\"></body></html>"
+        actual = get_urls_from_html(input_body, input_url)
+        expected = []
+        self.assertEqual(actual, expected)
+
+class TestCrawlURLs_Multi(unittest.TestCase):
+    def test_get_urls_from_html_absolute(self):
+        input_url = "https://testurldoesnotexist.com"
+        input_body= "<html><body><a href=\"https://testurldoesnotexist.com/silly\"><br /><a href=\"https://testurldoesnotexist.com/testagain\"></body></html>"
+        actual = get_urls_from_html(input_body, input_url)
+        expected = ["https://testurldoesnotexist.com/silly", "https://testurldoesnotexist.com/testagain"]
+        self.assertEqual(actual, expected)
+
+class TestCrawlURLs_Multi_Relative(unittest.TestCase):
+    def test_get_urls_from_html_relative(self):
+        input_url = "https://testurldoesnotexist.com"
+        input_body= "<html><body><a href=\"/silly\"><br /><a href=\"/testagain\"></body></html>"
+        actual = get_urls_from_html(input_body, input_url)
+        expected = ["https://testurldoesnotexist.com/silly", "https://testurldoesnotexist.com/testagain"]
+        self.assertEqual(actual, expected)
+
 class TestCrawlImages(unittest.TestCase):
     def test_get_images_from_html_relative(self):
         input_url = "https://blog.boot.dev"
         input_body = "<html><body><img src=\"/logo.png\" alt=\"Logo\"></body></html>"
         actual = get_images_from_html(input_body, input_url)
         expected = ["https://blog.boot.dev/logo.png"]
+        self.assertEqual(actual, expected)
+
+class TestCrawlImages_None(unittest.TestCase):
+    def test_get_images_from_html_relative(self):
+        input_url = "https://testurldoesnotexist.com"
+        input_body = "<html><body><a href=\"https://testurldoesnotexist.com\"></body></html>"
+        actual = get_images_from_html(input_body, input_url)
+        expected = []
+        self.assertEqual(actual, expected)
+
+class TestCrawlImages_Multi(unittest.TestCase):
+    def test_get_images_from_html_relative(self):
+        input_url = "https://testurldoesnotexist.com"
+        input_body = "<html><body><img src=\"/logo.png\" alt=\"Logo\"><br /><img src=\"/icon.png\" alt=\"Icon\"></body></html>"
+        actual = get_images_from_html(input_body, input_url)
+        expected = ["https://testurldoesnotexist.com/logo.png", "https://testurldoesnotexist.com/icon.png"]
         self.assertEqual(actual, expected)
 
 if __name__ == "__main__":

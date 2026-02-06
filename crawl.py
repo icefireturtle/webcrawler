@@ -67,17 +67,18 @@ def get_urls_from_html(html, base_url):
     doc = BeautifulSoup(html, 'html.parser')
     urls = []
 
-    print(f"Base url is: {base_url}")
-
     if len(html) == 0 or doc.find('a') == None:
-        print("No urls found")
         return urls
 
     for url in doc.find_all('a'):
         if url.get('href') != None:
-            urls.append(urljoin(base_url, url.get('href')))
-            print(f"Found url: {url.get('href')}")
-        
+            #absolute
+            if url.get('href').startswith('http') or url.get('href').startswith('https'):
+                urls.append(url.get('href'))
+            #relative
+            else:
+                urls.append(urljoin(base_url, url.get('href')))
+                
     return urls
 
 def get_images_from_html(html, base_url):
@@ -88,9 +89,7 @@ def get_images_from_html(html, base_url):
         return images
     
     for image in doc.find_all('img'):
-        print(f"image: {image}")
         if image.get('src') != None:
             images.append(urljoin(base_url, image.get('src')))
-            print(f"Found image: {image.get('src')}")
 
     return images
