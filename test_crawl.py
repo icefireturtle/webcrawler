@@ -1,5 +1,5 @@
 import unittest
-from crawl import normalize_url, get_h1_from_html, get_first_paragraph_from_html, get_urls_from_html, get_images_from_html
+from crawl import normalize_url, get_h1_from_html, get_first_paragraph_from_html, get_urls_from_html, get_images_from_html, extract_page_data
 
 class TestCrawlHTTPS(unittest.TestCase):
     def test_normalize_url(self):
@@ -160,6 +160,71 @@ class TestCrawlImages_Multi(unittest.TestCase):
         input_body = "<html><body><img src=\"/logo.png\" alt=\"Logo\"><br /><img src=\"/icon.png\" alt=\"Icon\"></body></html>"
         actual = get_images_from_html(input_body, input_url)
         expected = ["https://testurldoesnotexist.com/logo.png", "https://testurldoesnotexist.com/icon.png"]
+        self.assertEqual(actual, expected)
+
+class TestCrawlExtraction(unittest.TestCase):
+    def test_extract_page_data_basic(self):
+        input_url = "https://blog.boot.dev"
+        input_body = """<html><body>
+        <h1>Test Title</h1>
+        <p>This is the first paragraph.</p>
+        <a href="/link1">Link 1</a>
+        <img src="/image1.jpg" alt="Image 1">
+        </body></html>"""
+        actual = extract_page_data(input_body, input_url)
+        expected = {
+            "url": "https://blog.boot.dev",
+            "h1": "Test Title",
+            "first_paragraph": "This is the first paragraph.",
+            "outgoing_links": ["https://blog.boot.dev/link1"],
+            "image_urls": ["https://blog.boot.dev/image1.jpg"]
+        }
+        self.assertEqual(actual, expected)
+
+class TestCrawlExtraction_2(unittest.TestCase):
+    def test_extract_page_data_basic(self):
+        input_url = "https://www.testsitenotincluded.com"
+        input_body = """<html><body>
+        <img src="/moon.png" alt="Moon">
+        <main>
+        <a href="https://www.testsitenotincluded.com/gotalink">Gotalink</a>
+        <h1>Need Batteries</h1>
+        <p>Writing and things</p>
+        <h2>Subheading</h2>
+        <h1>Who did this?</h1>
+        <p>More things</p>
+        </main>
+        </body></html>"""
+        actual = extract_page_data(input_body, input_url)
+        expected = {
+            "url": "https://www.testsitenotincluded.com",
+            "h1": "Need Batteries",
+            "first_paragraph": "Writing and things",
+            "outgoing_links": ["https://www.testsitenotincluded.com/gotalink"],
+            "image_urls": ["https://www.testsitenotincluded.com/moon.png"]
+        }
+        self.assertEqual(actual, expected)
+
+class TestCrawlExtraction_3(unittest.TestCase):
+    def test_extract_page_data_basic(self):
+        input_url = "http://blog.boot.dev"
+        input_body = """<html>
+        <p>Super paragraph</p><body>
+        <h1>Title Tester</h1>
+        <main>
+        <img src="/sun.jpg" alt="Sun">
+        <a href="/link11282">Link 11282</a>
+        <p>This is some stuff here</p>
+        </main>
+        </body></html>"""
+        actual = extract_page_data(input_body, input_url)
+        expected = {
+            "url": "http://blog.boot.dev",
+            "h1": "Title Tester",
+            "first_paragraph": "This is some stuff here",
+            "outgoing_links": ["http://blog.boot.dev/link11282"],
+            "image_urls": ["http://blog.boot.dev/sun.jpg"]
+        }
         self.assertEqual(actual, expected)
 
 if __name__ == "__main__":
