@@ -73,13 +73,16 @@ def get_urls_from_html(html, base_url):
 
     for url in doc.find_all('a'):
         if url.get('href') != None:
-            #absolute
-            if url.get('href').startswith('http') or url.get('href').startswith('https'):
-                urls.append(url.get('href'))
-            #relative
-            else:
-                urls.append(urljoin(base_url, url.get('href')))
-                
+            try:
+                #absolute
+                if url.get('href').startswith('http') or url.get('href').startswith('https'):
+                    urls.append(url.get('href'))
+                #relative
+                else:
+                    urls.append(urljoin(base_url, url.get('href')))
+            except Exception as e:
+                print(f"error parsing URL {url.get('href')}: {e}")
+                continue        
     return urls
 
 def get_images_from_html(html, base_url):
@@ -109,19 +112,30 @@ def get_html(url):
 
     try:
         req = requests.get(url, headers={"User-Agent": "BootCrawler/1.0"})
+        print(f"fetched URL {url} with status code {req.status_code}")
+        print(f"with headers {req.headers.get('content-type', 'no content-type header')}")
 
     except Exception as e:
 
-        if req.status_code != requests.codes.ok:
-            raise Exception(f"error: {req.status_code}")
+        if req.status_code not in requests.codes.ok:
+            raise Exception(f"error: {req.status_code} {req.reason}")
 
-        elif req.headers['Content-Type'] != "text/html":
-            raise Exception(f"error: Content-Type is not text/html, it is {req.headers['Content-Type']}")
+        content_type = req.headers.get("content-type", "")
+        if "text/html" not in content_type:
+            raise Exception(f"error: content-type is not text/html, it is {content_type}")
 
-        else:
-            raise Exception("timeout error occurred while fetching URL")
+        raise Exception(f"timeout error occurred while fetching URL {url}: {e}")
 
-    return req.content
+    return req.text
+
+def get_safe_html(url):
+    try:
+        html = get_html(url)
+        return html
+
+    except Exception as e:
+        print(f"error fetching URL {url}: {e}")
+        return None
 
 def crawl_page(base_url, current_url=None, page_data=None):
     if current_url == None:
@@ -134,21 +148,36 @@ def crawl_page(base_url, current_url=None, page_data=None):
     current_parsed = urlparse(current_url)
 
     if base_parsed.hostname != current_parsed.hostname and current_parsed != None:
-        return
+        return page_data
     
-    if page_data != {} and current_url in page_data.keys():
-        return
+    normalized = normalize_url(current_url)
+
+    if page_data != {} and normalized in page_data.keys():
+        return page_data
     
     if page_data != {}:
         print(f"collected keys: {page_data.keys()}")
 
     print(f"crawling {current_url}")
     
-    html = get_html(current_url)
+    html = get_safe_html(current_url)
+    if html == None:
+        print(f"skipping {current_url} because it could not be fetched")
+        return page_data
 
-    page_data[normalize_url(current_url)] = extract_page_data(html, current_url)
+    page_data[normalized] = extract_page_data(html, current_url)
 
     urls = get_urls_from_html(html, current_url)
 
     for url in urls:
-        crawl_page(base_url, url, page_data)
+
+        print (f"found {len(urls)} urls on {current_url}")
+        
+        print(f"checking {url} for crawling")
+
+        if normalize_url(url) not in page_data.keys():
+            page_data = crawl_page(base_url, url, page_data)
+        else:
+            print(f"skipping {url} because it has already been crawled")
+    
+    return page_data

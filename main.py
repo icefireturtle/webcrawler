@@ -14,11 +14,16 @@ def main():
         print(f"starting crawl of: {sys.argv[1]}")
 
         try:
-            crawl.crawl_page(sys.argv[1])
+            page_data = crawl.crawl_page(sys.argv[1])
 
         except Exception as e:
             print(f"error retreiving HTML from {sys.argv[1]}: {e}")
             sys.exit(1)
+
+        print(f"crawled {len(page_data)} pages:")
+
+        for page in page_data.values():
+            print(f"  - {page['url']}: {len(page['outgoing_links'])} outgoing links")
 
         print("crawl complete")
         
