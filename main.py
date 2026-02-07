@@ -12,9 +12,14 @@ def main():
         sys.exit(1)
     else:
         print(f"starting crawl of: {sys.argv[1]}")
-        
-        html = crawl.get_html(sys.argv[1])
-        print(f"html is here: {html}")
+
+        try:
+            html = crawl.get_html(sys.argv[1])
+            print(f"html is here: {html}")
+
+        except Exception as e:
+            print(f"error retreiving HTML from {sys.argv[1]}: {e}")
+            sys.exit(1)
 
         print("crawl complete")
         

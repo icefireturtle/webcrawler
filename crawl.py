@@ -113,12 +113,12 @@ def get_html(url):
     except Exception as e:
 
         if req.status_code != requests.codes.ok:
-            return f"Error: {req.status_code}"
+            raise Exception(f"error: {req.status_code}")
 
         elif req.headers['Content-Type'] != "text/html":
-            return f"Error: Content-Type is not text/html, it is {req.headers['Content-Type']}"
+            raise Exception(f"error: Content-Type is not text/html, it is {req.headers['Content-Type']}")
 
         else:
-            return req.exceptions.Timeout
+            raise Exception("timeout error occurred while fetching URL")
 
     return req.content
