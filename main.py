@@ -1,4 +1,5 @@
 import sys
+import crawl
 
 def main():
     #print("Hello from webcrawler!")
@@ -11,7 +12,15 @@ def main():
         sys.exit(1)
     else:
         print(f"starting crawl of: {sys.argv[1]}")
+        
+        html = crawl.get_html(sys.argv[1])
+        print(f"html is here: {html}")
+
+        print("crawl complete")
+        
         sys.exit(0)
+
+
 
 if __name__ == "__main__":
     main()
