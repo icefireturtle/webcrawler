@@ -122,3 +122,33 @@ def get_html(url):
             raise Exception("timeout error occurred while fetching URL")
 
     return req.content
+
+def crawl_page(base_url, current_url=None, page_data=None):
+    if current_url == None:
+        current_url = base_url
+    
+    if page_data == None:
+        page_data = {}
+
+    base_parsed = urlparse(base_url)
+    current_parsed = urlparse(current_url)
+
+    if base_parsed.hostname != current_parsed.hostname and current_parsed != None:
+        return
+    
+    if page_data != {} and current_url in page_data.keys():
+        return
+    
+    if page_data != {}:
+        print(f"collected keys: {page_data.keys()}")
+
+    print(f"crawling {current_url}")
+    
+    html = get_html(current_url)
+
+    page_data[normalize_url(current_url)] = extract_page_data(html, current_url)
+
+    urls = get_urls_from_html(html, current_url)
+
+    for url in urls:
+        crawl_page(base_url, url, page_data)

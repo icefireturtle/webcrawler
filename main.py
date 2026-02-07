@@ -14,8 +14,7 @@ def main():
         print(f"starting crawl of: {sys.argv[1]}")
 
         try:
-            html = crawl.get_html(sys.argv[1])
-            print(f"html is here: {html}")
+            crawl.crawl_page(sys.argv[1])
 
         except Exception as e:
             print(f"error retreiving HTML from {sys.argv[1]}: {e}")
