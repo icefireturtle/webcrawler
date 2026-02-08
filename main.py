@@ -1,7 +1,8 @@
+import asyncio
 import sys
 import crawl
 
-def main():
+async def main():
     #print("Hello from webcrawler!")
 
     if len(sys.argv) < 2:
@@ -14,7 +15,7 @@ def main():
         print(f"starting crawl of: {sys.argv[1]}")
 
         try:
-            page_data = crawl.crawl_page(sys.argv[1])
+            page_data = await crawl.crawl_site_async(sys.argv[1])
 
         except Exception as e:
             print(f"error retreiving HTML from {sys.argv[1]}: {e}")
@@ -29,7 +30,5 @@ def main():
         
         sys.exit(0)
 
-
-
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
