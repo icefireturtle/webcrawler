@@ -1,6 +1,7 @@
 import asyncio
 import sys
 import crawl
+from csv_report import write_csv_report
 
 async def main():
     #print("Hello from webcrawler!")
@@ -33,6 +34,8 @@ async def main():
             print(f"  - {page['url']}: {len(page['outgoing_links'])} outgoing links")
 
         print("crawl complete")
+
+        write_csv_report(page_data)
         
         sys.exit(0)
 

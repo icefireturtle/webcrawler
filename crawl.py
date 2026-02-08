@@ -297,6 +297,8 @@ class AsyncCrawler:
     
     async def crawl(self):
         await self.async_crawl_page(self.base_url)
+        if self.all_tasks:
+            await asyncio.gather(*self.all_tasks, return_exceptions=True)
         return self.page_data
         
 
