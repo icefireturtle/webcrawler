@@ -193,6 +193,7 @@ class AsyncCrawler:
         self.max_concurency = 2
         self.semaphore = asyncio.Semaphore(self.max_concurency)
         self.session = None
+        self.max_pages = 50
 
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
@@ -258,12 +259,12 @@ class AsyncCrawler:
             async with self.lock:
                 self.page_data[normalized] = extract_page_data(html, current_url)
 
-            urls = get_urls_from_html(html, self.base_url)
+            links = get_urls_from_html(html, self.base_url)
 
         background_tasks = set()
 
-        for url in urls:
-            task = asyncio.create_task(self.async_crawl_page(url))
+        for link in links:
+            task = asyncio.create_task(self.async_crawl_page(link))
             background_tasks.add(task)
             
         if background_tasks:
